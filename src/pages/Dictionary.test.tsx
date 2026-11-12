@@ -58,8 +58,17 @@ describe('dictionary views and details',()=>{
       });
       await ready(()=>expect(document.querySelectorAll('.word-open,.word-table-open')).toHaveLength(1));
       expect(document.querySelector('.word-open,.word-table-open')?.textContent).toContain('학교');
-      await click(button('Озвучити корейський текст'));
-      expect(document.querySelector('[role="dialog"]')).toBeNull();
+      if(view==='Таблиця') {
+        await click(document.querySelector('.word-table-open'));
+        await ready(()=>expect(document.querySelector('.dictionary-detail')).not.toBeNull());
+        await click(button('Озвучити корейський текст'));
+        expect(document.querySelector('.dictionary-detail')).not.toBeNull();
+        await click(button('Закрити вікно'));
+        await ready(()=>expect(document.querySelector('[role="dialog"]')).toBeNull());
+      } else {
+        await click(button('Озвучити корейський текст'));
+        expect(document.querySelector('[role="dialog"]')).toBeNull();
+      }
       await act(async()=>{
         Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value')!.set!.call(input,'');
         input.dispatchEvent(new Event('input',{bubbles:true}));
@@ -97,10 +106,13 @@ describe('dictionary views and details',()=>{
     expect(document.activeElement).toBe(trigger);
   });
 
-  it('opens the editor from a word action without opening details and saves the word',async()=>{
+  it('opens editing from word details and saves the word',async()=>{
+    expect(button('Редагувати 사과')).toBeNull();
+    await click(button('Відкрити 사과'));
+    await ready(()=>expect(document.querySelector('.dictionary-detail')).not.toBeNull());
     await click(button('Редагувати 사과'));
     await ready(()=>expect(document.querySelector('.dictionary-edit')).not.toBeNull());
-    expect(document.querySelector('.dictionary-detail')).toBeNull();
+    await ready(()=>expect(document.querySelector('.dictionary-detail')).toBeNull());
     const input = document.querySelector<HTMLInputElement>('.dictionary-edit input')!;
     await act(async()=>{
       Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value')!.set!.call(input,'배');
