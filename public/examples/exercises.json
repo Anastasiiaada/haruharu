@@ -1,0 +1,1 @@
+{"format":"haruharu","version":1,"type":"exercises","exercises":[{"id":"example-particle","kind":"particle","topic":"Частки теми","prompt":"저___ 학생이에요.","answer":"는","options":["은","는"],"explanation":"저 закінчується на голосний, тому вживаємо 는.","demo":true}]}

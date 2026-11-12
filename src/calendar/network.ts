@@ -1,0 +1,1 @@
+export async function fetchWithTimeout(input:RequestInfo|URL,init:RequestInit,fetcher:typeof fetch=fetch){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),20000);try{return await fetcher(input,{...init,signal:controller.signal});}finally{clearTimeout(timer);}}

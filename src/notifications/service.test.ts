@@ -1,0 +1,31 @@
+import 'fake-indexeddb/auto';
+import {afterAll,afterEach,beforeEach,describe,it,expect,vi} from 'vitest';
+import {DateTime} from 'luxon';
+import {db} from '../services/db';
+import {seedWords} from '../data';
+import {parseNotificationPreferences,defaultNotificationPreferences,collectReminders,collectReleaseNotification,enqueueNotification,requestBrowserPermission} from './service';
+import {claimRelease,finishTour} from '../experience/state';
+import {portableSettings} from '../services/portableSettings';
+import {importData} from '../services/transfer';
+import {bundleSchema} from '../models';
+import type {LocalEvent,InboxItem} from '../calendar/models';
+const now=DateTime.fromISO('2026-11-12T18:30:00',{zone:'Europe/Kyiv'});
+const lesson:LocalEvent={id:'l1',title:'Урок',description:'',location:'',meetingUrl:'',start:'2026-11-12T19:00',end:'2026-11-12T20:00',allDay:false,kind:'lesson',repeat:'none',until:'2026-11-12',reminder:30};
+const item:InboxItem={id:'unique',title:'Нагадування',body:'Час корейської',date:now.toISO()!,read:false};
+async function prefs(patch:Partial<typeof defaultNotificationPreferences>){await db.settings.put({key:'notificationPreferences',value:JSON.stringify({...defaultNotificationPreferences,...patch})});}
+describe('notification delivery and preferences',()=>{
+  beforeEach(async()=>{await db.open();await db.transaction('rw',db.tables,async()=>{for(const table of db.tables)await table.clear();});});
+  afterEach(()=>vi.unstubAllGlobals());afterAll(()=>db.close());
+  it('accepts valid times and safely defaults corrupted settings',()=>{expect(parseNotificationPreferences('{oops')).toEqual(defaultNotificationPreferences);expect(parseNotificationPreferences(JSON.stringify({reviewTime:'25:30'}))).toEqual(defaultNotificationPreferences);expect(parseNotificationPreferences(JSON.stringify({reviewTime:'07:15',leadMinutes:60})).reviewTime).toBe('07:15');});
+  it('creates one inbox item and one browser delivery under concurrent collectors',async()=>{await prefs({browser:true});const deliver=vi.fn().mockResolvedValue(true);const created=await Promise.all([enqueueNotification(item,deliver),enqueueNotification(item,deliver),enqueueNotification(item,deliver)]);expect(created.filter(Boolean)).toHaveLength(1);expect(await db.inbox.count()).toBe(1);expect(deliver).toHaveBeenCalledTimes(1);expect((await db.inbox.get(item.id))?.browserNotifiedAt).toBeTruthy();});
+  it('keeps read state when checking the same event again',async()=>{await db.localEvents.put(lesson);await collectReminders(now);const notification=(await db.inbox.toArray())[0];await db.inbox.update(notification.id,{read:true});await collectReminders(now.plus({minutes:1}));expect(await db.inbox.count()).toBe(1);expect((await db.inbox.get(notification.id))?.read).toBe(true);});
+  it('respects event type preferences without suppressing homework',async()=>{await prefs({lessons:false});await db.localEvents.bulkPut([lesson,{...lesson,id:'hw',title:'Домашнє',kind:'homework'}]);await collectReminders(now);expect((await db.inbox.toArray()).map(n=>n.title)).toEqual(['Домашнє']);});
+  it('waits for the configured daily word time and sends at most once per Kyiv day',async()=>{await prefs({reviewTime:'19:00'});await db.words.put({...seedWords[0],due:0});await collectReminders(now);expect(await db.inbox.count()).toBe(0);await collectReminders(now.plus({minutes:31}));await collectReminders(now.plus({hours:2}));expect(await db.inbox.count()).toBe(1);expect((await db.inbox.toArray())[0].id).toBe('words:2026-11-12');});
+  it('does not emit stale event reminders older than a day',async()=>{await db.localEvents.put({...lesson,start:'2026-11-10T19:00',end:'2026-11-10T20:00'});await collectReminders(now);expect(await db.inbox.count()).toBe(0);});
+  it('never asks for browser permission during collection',async()=>{const requestPermission=vi.fn().mockResolvedValue('granted');vi.stubGlobal('window',{isSecureContext:true,Notification:{}});vi.stubGlobal('Notification',{permission:'default',requestPermission});await db.localEvents.put(lesson);await collectReminders(now);expect(requestPermission).not.toHaveBeenCalled();expect(await requestBrowserPermission()).toBe('granted');expect(requestPermission).toHaveBeenCalledTimes(1);});
+  it('retains internal notifications if native delivery fails',async()=>{await prefs({browser:true});await enqueueNotification(item,vi.fn().mockRejectedValue(Error('Not supported')));expect(await db.inbox.get(item.id)).toBeTruthy();expect((await db.settings.get('notificationLastError'))?.value).toContain('дзвіночку');});
+  it('adds release information only once and respects the update toggle',async()=>{await prefs({updates:false});await collectReleaseNotification();expect(await db.inbox.count()).toBe(0);await prefs({updates:true});await collectReleaseNotification();await collectReleaseNotification();expect(await db.inbox.count()).toBe(1);});
+  it('claims a new release once across concurrent opens and ignores rollback versions',async()=>{expect((await Promise.all([claimRelease('1.2.0'),claimRelease('1.2.0')])).filter(Boolean)).toHaveLength(1);expect(await claimRelease('1.1.0')).toBe(false);expect(await claimRelease('1.2.1')).toBe(true);expect((await db.settings.get('lastSeenVersion'))?.value).toBe('1.2.1');await finishTour();expect((await db.settings.get('tourCompleted'))?.value).toBe('yes');});
+  it('backs up timing and seen versions without transferring browser opt-in or tokens',()=>{const settings=portableSettings([{key:'notificationPreferences',value:JSON.stringify({...defaultNotificationPreferences,browser:true,reviewTime:'07:30'})},{key:'lastSeenVersion',value:'1.2.0'},{key:'releaseSeen:1.2.0',value:'yes'},{key:'access_token',value:'never'},{key:'googleLinked',value:'yes'}]);expect(settings).toHaveLength(3);expect(JSON.parse(settings[0].value)).toMatchObject({browser:false,reviewTime:'07:30'});});
+  it('restores inbox messages with stable IDs without resetting read state',async()=>{await db.inbox.put({...item,id:'release:1.2.0',read:true});const backup=bundleSchema.parse({format:'haruharu',version:1,type:'backup',inbox:[{...item,id:'release:1.2.0',read:false}]});await importData(backup);await importData(backup);expect(await db.inbox.count()).toBe(1);expect((await db.inbox.get('release:1.2.0'))?.read).toBe(true);});
+});

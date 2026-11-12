@@ -1,0 +1,2 @@
+import {parseNotificationPreferences} from '../notifications/service';
+export function portableSettings(settings:{key:string;value:string}[]){return settings.filter(s=>['theme','dailyGoal','speechRate','soundEffects','notificationPreferences','tourCompleted','lastSeenVersion'].includes(s.key)||/^releaseSeen:\d+\.\d+\.\d+$/.test(s.key)).map(s=>s.key==='notificationPreferences'?{...s,value:JSON.stringify({...parseNotificationPreferences(s.value),browser:false})}:s);}

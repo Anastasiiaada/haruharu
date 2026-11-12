@@ -1,0 +1,19 @@
+import {describe,it,expect,vi} from 'vitest';
+import {KoreanSpeech,koreanText,koreanVoice,parseSpeechRate} from './speech';
+function voice(lang:string,localService=false){return {lang,localService,name:lang,voiceURI:lang,default:false} as SpeechSynthesisVoice;}
+function setup(initial:SpeechSynthesisVoice[]=[voice('ko-KR')]){
+  let voices=initial;const utterances:SpeechSynthesisUtterance[]=[];const events=new EventTarget();
+  const synth={getVoices:()=>voices,cancel:vi.fn(),speak:vi.fn((u:SpeechSynthesisUtterance)=>utterances.push(u)),addEventListener:events.addEventListener.bind(events),removeEventListener:events.removeEventListener.bind(events)} as unknown as SpeechSynthesis;
+  const service=new KoreanSpeech(()=>synth,text=>({text} as SpeechSynthesisUtterance));
+  return {service,synth,utterances,load:(v:SpeechSynthesisVoice[])=>{voices=v;events.dispatchEvent(new Event('voiceschanged'));}};
+}
+describe('Korean speech',()=>{
+  it('selects only Korean voices and prefers local ko-KR',()=>{const local=voice('ko-KR',true);expect(koreanVoice([voice('en-US'),voice('ko-KR'),local])).toBe(local);expect(koreanVoice([voice('en-US')])).toBeUndefined();});
+  it('validates the three saved speed values',()=>{expect(parseSpeechRate('0.75')).toBe(.75);expect(parseSpeechRate('1.25')).toBe(1.25);expect(parseSpeechRate('2')).toBe(1);expect(parseSpeechRate()).toBe(1);});
+  it('extracts complete Korean phrases without Ukrainian instructions or translations',()=>{expect(koreanText('저는 학생이에요. — Я студент.')).toBe('저는 학생이에요.');expect(koreanText('Складіть: 저는 책을 읽어요.')).toBe('저는 책을 읽어요.');expect(koreanText('사과 물')).toBe('사과 물');expect(koreanText('Переклад')).toBe('');});
+  it('does not speak through a non-Korean fallback voice',()=>{const {service,synth}=setup([voice('en-US')]);service.speak('사과','one');expect(synth.speak).not.toHaveBeenCalled();expect(service.getSnapshot().message).toContain('Корейський голос');});
+  it('handles voiceschanged and allows a new user click after voices load',()=>{const {service,load,synth,utterances}=setup([]);const cleanup=service.initialize();service.speak('사과','one');expect(synth.speak).not.toHaveBeenCalled();load([voice('ko-KR')]);expect(service.getSnapshot().voiceName).toBe('ko-KR');service.rate=.75;service.speak('사과','one');expect(utterances[0].lang).toBe('ko-KR');expect(utterances[0].rate).toBe(.75);cleanup();load([voice('ko',true)]);expect(service.getSnapshot().voiceName).toBe('ko-KR');});
+  it('cancels the previous phrase, ignores its late events, and clears active state on stop',()=>{const {service,synth,utterances}=setup();service.speak('사과','one');service.speak('물','two');expect(synth.cancel).toHaveBeenCalledTimes(2);utterances[0].onend?.({} as SpeechSynthesisEvent);expect(service.getSnapshot().activeId).toBe('two');utterances[1].onstart?.({} as SpeechSynthesisEvent);expect(service.getSnapshot().status).toBe('speaking');service.stop();utterances[1].onerror?.({error:'interrupted'} as SpeechSynthesisErrorEvent);expect(service.getSnapshot().activeId).toBeNull();expect(service.getSnapshot().message).toBe('');});
+  it('reports browser failures and supports retrying the same phrase',()=>{const {service,utterances}=setup();service.speak('사과','one');utterances[0].onerror?.({error:'network'} as SpeechSynthesisErrorEvent);expect(service.getSnapshot().message).toContain('інтернету');service.speak('사과','one');expect(utterances).toHaveLength(2);expect(service.getSnapshot().message).toBe('');});
+  it('reports unsupported browsers and empty selections',()=>{const service=new KoreanSpeech(()=>undefined);service.speak('사과','one');expect(service.getSnapshot().message).toContain('недоступне');const supported=setup();supported.service.speak('Український текст','one');expect(supported.synth.speak).not.toHaveBeenCalled();expect(supported.service.getSnapshot().message).toContain('Виберіть');});
+});
