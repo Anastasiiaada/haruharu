@@ -6,3 +6,5 @@ const root=createRoot(document.getElementById('root')!);root.render(<div classNa
 import './help/help.css';
 
 import './game/design-system.css';
+
+import './components/mobile-learning.css';

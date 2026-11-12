@@ -1,0 +1,63 @@
+.dictionary-page{min-width:0;max-width:100%}
+.dictionary-tools .search{min-width:0;flex:1 1 220px}
+.dictionary-tools .search input{min-width:0;width:100%}
+.dictionary-options{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:16px 0}
+.dictionary-views{display:flex;gap:3px;padding:4px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.dictionary-views button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:8px 13px;border:0;border-radius:9px;background:transparent;font-size:12px;color:var(--text)}
+.dictionary-views button[aria-pressed=true]{background:var(--lav);color:var(--accent)}
+.dictionary-sort,.dictionary-sort label{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
+.dictionary-sort select{max-width:190px}
+.dictionary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:14px}
+.dictionary-word{padding:17px;min-width:0;background:var(--surface)}
+.dictionary-word.is-learned{border-color:var(--mint)}
+.word-open{display:flex;flex-direction:column;align-items:flex-start;gap:10px;width:100%;min-width:0;text-align:left;border:0;padding:0 0 12px;background:transparent;color:var(--text);border-radius:8px}
+.dictionary-korean{font-size:27px;line-height:1.5;font-weight:650;color:var(--accent);overflow-wrap:anywhere;max-width:100%}
+.dictionary-translation{font-size:14px;line-height:1.6;overflow-wrap:anywhere;max-width:100%}
+.dictionary-meta{display:flex;flex-wrap:wrap;gap:5px 12px;color:var(--muted);font-size:10px;line-height:1.6;overflow-wrap:anywhere}
+.dictionary-actions{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.dictionary-actions .icon-btn,.dictionary-actions .speak-btn{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:10px}
+.dictionary-actions .word-status[aria-pressed=true]{background:var(--mint);color:var(--text);border-radius:12px}
+.dictionary-list{display:flex;flex-direction:column;gap:8px}
+.dictionary-list .dictionary-word{display:flex;align-items:center;gap:12px;padding:12px 16px}
+.dictionary-list .word-open{flex:1;padding:0;gap:5px}
+.dictionary-list .dictionary-korean{font-size:23px}
+.dictionary-list .dictionary-translation{font-size:13px}
+.dictionary-list .dictionary-actions{flex:0 0 auto}
+.dictionary-table-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;border:1px solid var(--line);border-radius:15px;background:var(--surface);-webkit-overflow-scrolling:touch}
+.dictionary-table{width:100%;min-width:650px;border-collapse:collapse;font-size:12px}
+.dictionary-table th,.dictionary-table td{padding:11px 13px;border:0;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle;max-width:230px;overflow-wrap:anywhere}
+.dictionary-table th{background:var(--bg);font-weight:600}
+.dictionary-table th button{display:flex;align-items:center;gap:6px;min-height:44px;border:0;background:transparent;color:var(--text);font:inherit;text-align:left}
+.word-table-open{min-height:44px;background:transparent;border:0;color:var(--accent);font-size:19px;text-align:left;overflow-wrap:anywhere}
+.dictionary-table .dictionary-actions{min-width:188px;flex-wrap:nowrap}
+.dictionary-detail{width:540px;overflow-x:hidden}
+.dictionary-detail h2{font-size:clamp(27px,7vw,42px);line-height:1.5;color:var(--accent);overflow-wrap:anywhere;margin:20px 0 12px;padding-right:12px}
+.word-detail-translation{font-size:18px;line-height:1.7;overflow-wrap:anywhere}
+.word-detail-example{display:flex;align-items:flex-start;gap:12px;margin:22px 0;padding:15px;border-radius:12px;background:var(--bg)}
+.word-detail-example p{flex:1;min-width:0;overflow-wrap:anywhere;line-height:1.9;margin:0}
+.dictionary-edit input{max-width:100%;min-width:0}
+.dictionary-edit .form{padding:0}
+.dictionary-edit h2{padding-right:30px}
+.word-open:focus-visible,.word-table-open:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+@media(max-width:600px){
+  .dictionary-options{align-items:flex-start;flex-direction:column}
+  .dictionary-views{width:100%}
+  .dictionary-views button{flex:1;min-width:0;font-size:11px;padding:8px}
+  .dictionary-sort{width:100%;justify-content:space-between}
+  .dictionary-sort label{flex:1;justify-content:space-between}
+  .dictionary-sort select{flex:1;max-width:210px;min-width:0}
+  .dictionary-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .dictionary-word{padding:13px}
+  .dictionary-korean{font-size:23px}
+  .dictionary-translation{font-size:12px}
+  .dictionary-meta{font-size:10px;gap:4px 8px}
+  .dictionary-grid .dictionary-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px}
+  .dictionary-grid .speech-controls{display:contents}
+  .dictionary-grid .dictionary-actions button{justify-self:center}
+  .dictionary-list .dictionary-word{align-items:flex-start;padding:12px;gap:8px}
+  .dictionary-list .dictionary-actions{display:grid;grid-template-columns:repeat(2,44px);gap:0}
+  .dictionary-list .speech-controls{display:contents}
+  .dictionary-tools input,.dictionary-tools select,.dictionary-edit input{font-size:16px}
+  .dictionary-detail,.dictionary-edit{padding:25px 20px}
+}
+@media(max-width:350px){.dictionary-grid{grid-template-columns:minmax(0,1fr)}.dictionary-grid .dictionary-actions{display:flex}.dictionary-grid .speech-controls{display:inline-flex}}

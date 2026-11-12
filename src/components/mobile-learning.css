@@ -1,0 +1,22 @@
+main{min-width:0}
+.speech-feedback{display:flex;align-items:center;justify-content:space-between;gap:12px;width:min(620px,calc(100% - 24px));margin:10px auto;padding:10px 12px;background:var(--surface);color:var(--muted);border:1px solid var(--line);border-radius:12px;font-size:12px;line-height:1.6}
+.speech-feedback button{display:flex;align-items:center;gap:5px;min-height:44px;border:0;background:transparent;color:var(--text);flex-shrink:0;font-size:11px}
+.selection-speech .speak-btn:disabled{opacity:.4;cursor:default}
+.selection-speech .speak-btn{min-width:44px;min-height:44px}
+.experience-overlay{padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+.experience-overlay>.modal{max-height:min(90dvh,100%);min-height:0;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}
+.flash-study{max-width:660px;min-width:0;margin:10px auto}
+.flash-study .flash-study-top{margin-bottom:12px}
+.flash-study .flip-tile{height:auto;min-height:clamp(180px,32svh,280px)}
+.flash-study .flip-inner{position:relative;inset:auto;display:grid;min-height:inherit}
+.flash-study .flip-face{position:relative;inset:auto;grid-area:1/1;min-width:0;max-width:100%;padding:20px;gap:12px;overflow:visible}
+.flash-study .flip-face strong{max-width:100%;font-size:clamp(25px,6vw,38px);line-height:1.4;overflow-wrap:anywhere}
+.flash-study .flip-back strong{font-size:clamp(23px,5.5vw,32px)}
+.flash-study .flip-caption{overflow-wrap:anywhere;max-width:100%;font-size:12px;line-height:1.7}
+.flash-study .flip-hint{font-size:10px;margin-top:2px}
+.flash-study .card-audio{min-height:44px;margin-top:12px}
+.flash-study .card-audio .speak-btn{min-height:44px;min-width:44px}
+.flash-study .rating-panel{margin-top:10px}
+.flash-study .rating-panel h3{margin-bottom:10px}
+.flash-study .ratings .btn{min-height:52px;white-space:normal}
+@media(max-width:430px){.flash-study .ratings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.flash-study .ratings .btn{font-size:12px;padding:10px 6px}.flash-study .ratings small{font-size:9px}.lesson-study .answer-input{font-size:20px;max-width:100%;min-width:0}.speech-feedback{align-items:flex-start}}
