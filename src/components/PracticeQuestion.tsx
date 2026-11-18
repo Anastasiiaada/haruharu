@@ -45,8 +45,7 @@ export function Question({exercise, onAnswer, busy = false, exam = false}: {
         <summary>Підказка</summary><p>{exercise.explanation}</p>
       </details>}
     </div>
-    <m.button className="btn answer-submit" whileTap={{scale:.97}}
-      animate={{backgroundColor:busy?'#B8A2C8':'#9879B1'}} disabled={!canSubmit}>
+    <m.button className="btn answer-submit" whileTap={{scale:.97}} disabled={!canSubmit}>
       {busy ? 'Зберігаємо…' : exam ? 'Зберегти відповідь' : 'Перевірити'}<ArrowRight size={17}/>
     </m.button>
   </form>;

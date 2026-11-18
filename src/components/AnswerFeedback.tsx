@@ -18,6 +18,6 @@ export function AnswerFeedback({attempt,exam,xp,combo,last,busy,onNext}:{attempt
         {attempt.exercise.explanation&&<div className="spoken-line"><p>{attempt.exercise.explanation}</p><SpeakButton text={attempt.exercise.explanation}/></div>}
       </>:<p>Відповідь збережена. Розбір помилок — у підсумку іспиту.</p>}</div><Mascot mood={attempt.correct?combo>=3?'cheer':'happy':'support'} size={70}/></div>
     </div>
-    <m.button className="btn feedback-next" whileTap={reduce?{}:{scale:.97}} animate={{backgroundColor:attempt.correct?'#67826B':'#9073A6'}} disabled={busy} onClick={onNext}>{busy?'Зберігаємо…':last?'Завершити':'Далі'}<ArrowRight size={18}/></m.button>
+    <m.button className="btn feedback-next" whileTap={reduce?{}:{scale:.97}} disabled={busy} onClick={onNext}>{busy?'Зберігаємо…':last?'Завершити':'Далі'}<ArrowRight size={18}/></m.button>
   </m.section>;
 }

@@ -1,6 +1,7 @@
 import type {Table} from 'dexie';
 import type {Exercise, Note, Word} from '../models';
 import {db} from './db';
+import {exerciseKey, noteKey, wordKey} from './materialIdentity';
 
 export const materialTypes = ['exercises', 'words', 'notes'] as const;
 export type MaterialType = typeof materialTypes[number];
@@ -18,17 +19,16 @@ export class StaleRemovalPreviewError extends Error {
   }
 }
 
-const normalize = (text = '') => text.normalize('NFC').trim();
 const preferPersonal = (a: Material, b: Material) => Number(!!a.demo) - Number(!!b.demo);
 
 async function findDuplicates<T extends Material>(
-  table: Table<T>, contentKey: (record: T) => unknown[], label: (record: T) => string,
+  table: Table<T>, contentKey: (record: T) => string, label: (record: T) => string,
   prefer: (a: T, b: T) => number = preferPersonal,
   describe: (record: T) => string = record => record.demo ? 'Демо A1' : 'Особистий запис',
 ): Promise<DuplicateGroup[]> {
   const matches = new Map<string, T[]>();
   for (const record of await table.toArray()) {
-    const key = JSON.stringify(contentKey(record));
+    const key = contentKey(record);
     const group = matches.get(key);
     if (group) group.push(record);
     else matches.set(key, [record]);
@@ -44,20 +44,12 @@ async function findDuplicates<T extends Material>(
 }
 
 const duplicateFinders = {
-  exercises: () => findDuplicates<Exercise>(db.exercises, exercise => [
-    exercise.kind, normalize(exercise.topic), normalize(exercise.prompt), normalize(exercise.answer),
-    exercise.options?.map(normalize), exercise.tokens?.map(normalize),
-    normalize(exercise.audio), normalize(exercise.explanation),
-  ], exercise => `${exercise.topic} · ${exercise.prompt}`),
-  words: () => findDuplicates<Word>(db.words, word => [
-    normalize(word.korean), normalize(word.translation), normalize(word.category), normalize(word.example),
-  ], word => `${word.korean} — ${word.translation} · ${word.category}`,
+  exercises: () => findDuplicates<Exercise>(db.exercises, exerciseKey, exercise => `${exercise.topic} · ${exercise.prompt}`),
+  words: () => findDuplicates<Word>(db.words, wordKey, word => `${word.korean} — ${word.translation} · ${word.category}`,
   (a, b) => Number(!!b.learned) - Number(!!a.learned) ||
     (b.interval ?? 0) - (a.interval ?? 0) || (b.due ?? 0) - (a.due ?? 0) || preferPersonal(a, b),
   word => `${word.learned ? 'Вивчено' : 'Вивчаю'} · інтервал ${word.interval ?? 0} дн.${word.demo ? ' · Демо A1' : ''}`),
-  notes: () => findDuplicates<Note>(db.notes, note => [
-    normalize(note.title), note.category, note.content,
-  ], note => `${note.title} · ${note.category}`,
+  notes: () => findDuplicates<Note>(db.notes, noteKey, note => `${note.title} · ${note.category}`,
   (a, b) => preferPersonal(a, b) || (b.updatedAt ?? 0) - (a.updatedAt ?? 0),
   note => `${note.demo ? 'Демо A1' : 'Особистий запис'}${note.updatedAt ? ' · ' + new Date(note.updatedAt).toLocaleString('uk-UA') : ''}`),
 };

@@ -1,2 +1,72 @@
-import {useState} from 'react';import {Upload,Download,X} from 'lucide-react';import type {Bundle} from '../models';import {exportData,parseFile,importData} from '../services/transfer';
-export function Transfer({type}:{type:Bundle['type']}){const [preview,setPreview]=useState<Bundle|null>(null);const [error,setError]=useState('');const [busy,setBusy]=useState(false);return <><button className="btn secondary" onClick={()=>void exportData(type).catch(e=>setError(String(e)))}><Download size={16}/>Експорт</button><label className="btn secondary"><Upload size={16}/>Імпорт<input hidden type="file" accept="application/json,.json" onChange={async e=>{const f=e.target.files?.[0];e.target.value='';if(!f)return;try{setError('');const b=await parseFile(f);if(b.type!==type)throw Error(`Потрібен файл типу ${type}.`);setPreview(b);}catch(err){setError(String(err));}}}/></label>{error&&<p className="error" role="alert">{error}</p>}{preview&&<div className="overlay"><section className="modal"><button className="close" aria-label="Закрити" onClick={()=>setPreview(null)}><X/></button><span className="eyebrow">ПЕРЕВІРЕНО · JSON V1</span><h2>Попередній перегляд</h2><p>Буде додано: {preview.notes.length} конспектів, {preview.words.length} слів, {preview.exercises.length} вправ.</p>{type==='backup'&&<p>Також: {preview.localEvents.length} локальних подій, {preview.calendarSources.length} джерел календаря, {preview.attempts.length} відповідей, {preview.exams.length} іспитів. Тему буде відновлено. Наявні дані залишаться; повторний імпорт створить копії.</p>}<div className="preview-list">{[...preview.notes.map(x=>x.title),...preview.words.map(x=>`${x.korean} — ${x.translation}`),...preview.exercises.map(x=>x.prompt)].slice(0,15).map((x,i)=><p key={i}>{x}</p>)}</div><button disabled={busy} className="btn" onClick={async()=>{setBusy(true);try{await importData(preview);setPreview(null);}catch(e){setError(String(e));}finally{setBusy(false);}}}>{busy?'Збереження…':'Додати до бібліотеки'}</button></section></div>}</>;}
+import {useId, useRef, useState} from 'react';
+import {Download, Upload} from 'lucide-react';
+import type {Bundle} from '../models';
+import {exportData, importData, parseFile} from '../services/transfer';
+import {Dialog} from './Dialog';
+
+export function Transfer({type}: {type: Bundle['type']}) {
+  const input = useRef<HTMLInputElement>(null);
+  const titleId = useId();
+  const [preview, setPreview] = useState<Bundle | null>(null);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  function close() {
+    if (busy) return;
+    setPreview(null);
+    setError('');
+  }
+
+  async function confirmImport() {
+    if (!preview || busy) return;
+    setBusy(true);
+    setError('');
+    try {
+      await importData(preview);
+      setPreview(null);
+    } catch (cause) {
+      setError(String(cause));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return <>
+    <button type="button" className="btn secondary" onClick={() => {
+      setError('');
+      void exportData(type).catch(cause => setError(String(cause)));
+    }}><Download size={16}/>Експорт</button>
+    <button type="button" className="btn secondary" onClick={() => input.current?.click()}><Upload size={16}/>Імпорт</button>
+    <input ref={input} hidden type="file" accept="application/json,.json" aria-label="Файл JSON" onChange={async event => {
+      const file = event.currentTarget.files?.[0];
+      event.currentTarget.value = '';
+      if (!file) return;
+      setError('');
+      try {
+        const bundle = await parseFile(file);
+        if (bundle.type !== type) throw new Error(`Потрібен файл типу ${type}.`);
+        setPreview(bundle);
+      } catch (cause) {
+        setError(String(cause));
+      }
+    }}/>
+    {!preview && error && <p className="error" role="alert">{error}</p>}
+    {preview && <Dialog titleId={titleId} onClose={close} className="transfer-preview">
+      <h2 id={titleId}>Попередній перегляд імпорту</h2>
+      <dl className="transfer-counts">
+        <div><dt>Конспектів</dt><dd>{preview.notes.length}</dd></div>
+        <div><dt>Слів</dt><dd>{preview.words.length}</dd></div>
+        <div><dt>Вправ</dt><dd>{preview.exercises.length}</dd></div>
+      </dl>
+      {type === 'backup' && <p>Також буде додано {preview.localEvents.length} локальних подій, {preview.calendarSources.length} джерел календаря, {preview.attempts.length} відповідей та {preview.exams.length} іспитів. Тему буде відновлено. Повторний імпорт створить копії матеріалів.</p>}
+      <ul className="preview-list">
+        {[...preview.notes.map(note => note.title), ...preview.words.map(word => `${word.korean} — ${word.translation}`),
+          ...preview.exercises.map(exercise => exercise.prompt)].slice(0, 15).map((label, index) => <li key={index}>{label}</li>)}
+      </ul>
+      {error && <p className="error" role="alert">{error}</p>}
+      <button type="button" className="btn" disabled={busy} onClick={() => void confirmImport()}>
+        {busy ? 'Збереження…' : 'Додати до бібліотеки'}
+      </button>
+    </Dialog>}
+  </>;
+}

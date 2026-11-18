@@ -1,0 +1,69 @@
+.note-content {
+  --note-idea: #fbe6ef;
+  --note-formula: #eee5fa;
+  --note-examples: #e5f4e9;
+  --note-important: #ffeddb;
+  --note-comparison: #e4f1fb;
+  --note-ink: var(--text);
+  color: var(--note-ink);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+[data-theme="dark"] .note-content {
+  --note-idea: #513344;
+  --note-formula: #453456;
+  --note-examples: #2b443c;
+  --note-important: #503b31;
+  --note-comparison: #304456;
+}
+
+.note-content [data-note-tone="idea"] { --note-block: var(--note-idea); }
+.note-content [data-note-tone="formula"] { --note-block: var(--note-formula); }
+.note-content [data-note-tone="examples"] { --note-block: var(--note-examples); }
+.note-content [data-note-tone="important"] { --note-block: var(--note-important); }
+.note-content [data-note-tone="comparison"] { --note-block: var(--note-comparison); }
+
+.note-content [data-note-tone] {
+  background-color: var(--note-block);
+  border: 1px solid color-mix(in srgb, var(--note-ink) 23%, var(--note-block));
+  border-radius: 12px;
+}
+
+.note-content :is(div, section, aside, blockquote, p)[data-note-tone] {
+  padding: clamp(10px, 3vw, 16px);
+  margin-block: 12px;
+}
+
+.prose .note-content :is(p, h1, h2, h3, h4, h5, h6, strong, b, em, li, dt, dd, blockquote, span, td, th, a, code, mark, small, pre, font) {
+  color: var(--note-ink);
+}
+
+.prose .note-content :is(blockquote, code, mark, th) {
+  background-color: color-mix(in srgb, var(--note-ink) 10%, transparent);
+}
+
+.prose .note-content :is(blockquote, code, mark, th)[data-note-tone] { background-color: var(--note-block); }
+.note-content blockquote { border-color: var(--accent); }
+.note-content a { text-decoration: underline; text-underline-offset: 2px; }
+.note-content img { max-width: 100%; height: auto; }
+.note-content pre { white-space: pre-wrap; }
+
+.note-content .note-table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  margin-block: 12px;
+  overscroll-behavior-inline: contain;
+}
+
+.note-content .note-table-scroll table {
+  margin: 0;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.note-content :is(td, th) {
+  border: 1px solid color-mix(in srgb, var(--note-ink) 26%, transparent);
+  padding: clamp(6px, 2vw, 11px);
+  vertical-align: top;
+}

@@ -1,12 +1,12 @@
 import {lazy, Suspense, useState} from 'react';
 import {useLiveQuery} from 'dexie-react-hooks';
 import {Plus, Search, Trash2, Pencil, BookOpen, ArrowLeft} from 'lucide-react';
-import DOMPurify from 'dompurify';
 import {db, uid} from '../services/db';
 import type {Note} from '../models';
 import {Transfer} from '../components/Transfer';
 import {KoreanSelection, SpeechSpeed} from '../components/Speech';
 import {SelectableMaterial, useMaterialPage, useMaterialSelection} from '../components/MaterialSelection';
+import {NoteContent} from '../components/NoteContent';
 
 const RichEditor = lazy(() => import('../components/Editor').then(module => ({default: module.Editor})));
 const categories = ['Усі', 'Граматика', 'Лексика', 'Інше'];
@@ -48,7 +48,7 @@ export function Library() {
       <p className="error">{error}</p><button className="btn">Зберегти конспект</button>
     </form> : <KoreanSelection><article className="card prose">
       <SpeechSpeed/><span className="tag">{active.category}{active.demo ? ' · Демо A1' : ''}</span>
-      <div dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(active.content)}}/>
+      <NoteContent html={active.content}/>
     </article></KoreanSelection>}
   </>;
 
