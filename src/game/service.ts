@@ -13,4 +13,23 @@ const total=async()=>(await db.rewards.toArray()).reduce((s,r)=>s+r.xp,0);
 export async function recordAttempt(attempt:Attempt){return db.transaction('rw',tables(),async()=>{const before=await total();if(await db.attempts.get(attempt.id))return snapshot(before,0,[]);await db.attempts.add(attempt);const xp=await insertReward({id:`answer:${attempt.id}`,kind:'answer',reference:attempt.id,xp:attempt.correct?10:3,date:attempt.date,correct:attempt.correct});return rewardsAndBadges(before,xp,attempt.date);});}
 export async function rateWord(wordId:string,rating:'again'|'hard'|'good'|'easy',now=new Date()){return db.transaction('rw',tables(),async()=>{const word=await db.words.get(wordId);if(!word)throw Error('Слово вже видалено.');const before=await total();const date=now.toISOString();const changes=review(word.interval,rating,now.getTime());await db.words.update(wordId,changes);let xp=await insertReward({id:`review:${wordId}:${gameDay(now)}`,kind:'review',reference:wordId,xp:rating==='again'?2:5,date});if(changes.learned)xp+=await insertReward({id:`mastered:${wordId}`,kind:'mastered',reference:wordId,xp:5,date});return xp?rewardsAndBadges(before,xp,date):snapshot(before,0,[]);});}
 export async function markWordLearned(wordId:string,learned:boolean){return db.transaction('rw',tables(),async()=>{const word=await db.words.get(wordId);if(!word)throw Error('Слово вже видалено.');const before=await total();await db.words.update(wordId,{learned});const date=new Date().toISOString();const xp=learned?await insertReward({id:`mastered:${wordId}`,kind:'mastered',reference:wordId,xp:5,date}):0;return xp?rewardsAndBadges(before,xp,date):snapshot(before,0,[]);});}
-export async function finishLearningSession(sessionId:string,attemptIds:string[],expected:number,exam:boolean){return db.transaction('rw',tables(),async()=>{if(!expected||new Set(attemptIds).size!==expected||attemptIds.some(id=>!id.startsWith(`${sessionId}:`)))throw Error('Заняття ще не завершено.');const attempts=await db.attempts.bulkGet(attemptIds);if(attempts.some(a=>!a))throw Error('Не всі відповіді збережено.');const score=attempts.filter(a=>a!.correct).length;const before=await total();const date=new Date().toISOString();if(exam&&!await db.exams.get(`exam:${sessionId}`))await db.exams.add({id:`exam:${sessionId}`,date,total:expected,score});const xp=await insertReward({id:`session:${sessionId}`,kind:'session',reference:sessionId,xp:20,date});const action=xp?await rewardsAndBadges(before,xp,date,score===expected&&expected>=5):await snapshot(before,0,[]);return {...action,score};});}
+export async function finishLearningSession(sessionId:string, attemptIds:string[], expected:number, exam:boolean, timedOut=false) {
+  return db.transaction('rw', tables(), async () => {
+    const complete = attemptIds.length === expected;
+    if (!Number.isInteger(expected) || expected <= 0 || attemptIds.length > expected || (!complete && !(exam && timedOut)) ||
+      new Set(attemptIds).size !== attemptIds.length || attemptIds.some(id => !id.startsWith(`${sessionId}:`))) {
+      throw Error('Заняття ще не завершено.');
+    }
+    const attempts = await db.attempts.bulkGet(attemptIds);
+    if (attempts.some(attempt => !attempt)) throw Error('Не всі відповіді збережено.');
+    const score = attempts.filter(attempt => attempt?.correct).length;
+    const before = await total();
+    const date = new Date().toISOString();
+    if (exam && !await db.exams.get(`exam:${sessionId}`)) {
+      await db.exams.add({id:`exam:${sessionId}`, date, total:expected, score});
+    }
+    const xp = complete ? await insertReward({id:`session:${sessionId}`, kind:'session', reference:sessionId, xp:20, date}) : 0;
+    const action = xp ? await rewardsAndBadges(before, xp, date, score === expected && expected >= 5) : await snapshot(before, 0, []);
+    return {...action, score};
+  });
+}
