@@ -1,8 +1,8 @@
 .day-overview { display: grid; gap: 14px; max-width: 760px; margin-inline: auto; }
 .day-overview .page-heading { margin-bottom: 0; }
-.day-overview h1 { font-size: clamp(25px, 5vw, 36px); }
+.day-overview h1 { font-size: var(--type-page); }
 .day-overview h1 span { color: var(--accent, #9879b1); }
-.day-overview h2 { font-size: clamp(17px, 4vw, 22px); margin: 0; }
+.day-overview h2 { font-size: var(--type-section); margin: 0; }
 .day-start {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -15,15 +15,15 @@
 .day-start .mascot svg { width: clamp(68px, 20vw, 116px); height: auto; }
 .day-goal { padding: 14px 16px; display: grid; gap: 10px; }
 .day-goal-heading { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; }
-.day-goal .goal-select { font-size: 13px; }
-.day-goal .goal-select select { font-size: 14px; }
+.day-goal .goal-select { font-size: var(--type-secondary); }
+.day-goal .goal-select select { font-size: var(--type-control); }
 .day-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .day-stat { display: grid; align-content: start; gap: 5px; padding: clamp(9px, 3vw, 16px); }
 .day-stat svg, .day-library svg { color: var(--accent, #9879b1); }
-.day-stat strong { font-size: clamp(21px, 5vw, 28px); }
-.day-stat span { font-size: 13px; line-height: 1.35; overflow-wrap: anywhere; }
+.day-stat strong { font-size: var(--type-metric); }
+.day-stat span { font-size: var(--type-caption); line-height: 1.35; overflow-wrap: anywhere; }
 .day-library { display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 5px 12px; }
-.day-library a { display: inline-flex; gap: 6px; align-items: center; min-height: 44px; font-size: 13px; }
+.day-library a { display: inline-flex; gap: 6px; align-items: center; min-height: 44px; font-size: var(--type-secondary); }
 
 .note-speech-content, .note-speech-content .prose, .note-speech-content .tiptap {
   -webkit-user-select: text;
@@ -61,7 +61,7 @@
 .swipe-tutorial p, .swipe-tutorial dl { margin-block: 12px; }
 .swipe-tutorial dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .swipe-tutorial dt { font-weight: 700; }
-.swipe-tutorial dd { margin: 0; font-size: 13px; }
+.swipe-tutorial dd { margin: 0; font-size: var(--type-secondary); }
 .swipe-demo { display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 12px; overflow: hidden; background: var(--bg); border-radius: 14px; }
 .swipe-demo-card {
   display: grid;
@@ -71,7 +71,7 @@
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--surface);
-  font-size: 22px;
+  font-size: var(--type-korean);
   animation: swipe-demo 3.6s ease-in-out infinite;
 }
 @keyframes swipe-demo {
@@ -82,7 +82,7 @@
 @media (prefers-reduced-motion: reduce) { .swipe-demo-card { animation: none; } }
 
 .practice-modes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
-.practice-modes a { display: grid; place-items: center; text-align: center; min-height: 44px; padding: 7px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); font-size: 13px; }
+.practice-modes a { display: grid; place-items: center; text-align: center; min-height: 44px; padding: 7px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); font-size: var(--type-control); }
 .practice-modes .selected { background: color-mix(in srgb, #b396cd 26%, var(--surface)); border-color: #9879b1; font-weight: 700; }
 .practice-config { padding: clamp(14px, 4vw, 26px); display: grid; gap: 14px; }
 .practice-config h2, .practice-config p { margin: 0; }
@@ -94,13 +94,13 @@
 .practice-types input[type="checkbox"] { width: 19px; height: 19px; }
 .practice-types small { color: var(--muted); }
 .practice-options { display: flex; flex-wrap: wrap; gap: 12px; }
-.practice-options label { display: grid; gap: 4px; min-width: 0; font-size: 14px; }
-.practice-options input, .practice-options select { border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px; background: var(--surface); color: var(--text); font-size: 16px; }
+.practice-options label { display: grid; gap: 4px; min-width: 0; font-size: var(--type-secondary); }
+.practice-options input, .practice-options select { border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px; background: var(--surface); color: var(--text); font-size: var(--type-control); }
 .practice-config > .btn { justify-self: start; }
 .exam-feedback { display: grid; gap: 14px; justify-items: start; padding: 18px; }
 .practice-hint { padding-block: 6px; overflow-wrap: anywhere; }
 .practice-hint summary { cursor: pointer; }
-.session-timer { font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 14px; }
+.session-timer { font-variant-numeric: tabular-nums; white-space: nowrap; font-size: var(--type-caption); }
 .app-shell:has(.exam-in-progress) .topbar .level-chip { visibility: hidden; }
 
 @media (max-width: 800px) {

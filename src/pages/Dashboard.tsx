@@ -40,9 +40,9 @@ export function Dashboard() {
       <Link className="card day-stat" to="/statistics"><CheckCircle2 size={20}/><strong>{accuracy === null ? '—' : `${accuracy}%`}</strong><span>Точність</span></Link>
     </div>
     <nav className="card day-library" aria-label="Навчальні матеріали">
-      <Link to="/words"><Layers size={18}/>Слів: {words.length}</Link>
-      <Link to="/practice"><PenLine size={18}/>Вправ: {data.exercises}</Link>
-      <Link to="/notes"><BookOpen size={18}/>Конспектів: {data.notes}</Link>
+      <Link to="/words"><span className="day-library-count"><Layers size={18}/><strong>{words.length}</strong></span>Слів</Link>
+      <Link to="/practice"><span className="day-library-count"><PenLine size={18}/><strong>{data.exercises}</strong></span>Вправ</Link>
+      <Link to="/notes"><span className="day-library-count"><BookOpen size={18}/><strong>{data.notes}</strong></span>Конспектів</Link>
     </nav>
   </div>;
 }

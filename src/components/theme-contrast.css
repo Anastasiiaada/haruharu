@@ -154,8 +154,8 @@
   color: var(--text);
   text-align: center;
 }
-.transfer-counts dt { font-size: 13px; overflow-wrap: anywhere; }
-.transfer-counts dd { margin: 0; font-size: 18px; font-weight: 700; }
+.transfer-counts dt { font-size: var(--type-caption); overflow-wrap: anywhere; }
+.transfer-counts dd { margin: 0; font-size: var(--type-metric); font-weight: 700; }
 .transfer-preview .preview-list {
   list-style: none;
   color: var(--text);
@@ -163,7 +163,7 @@
   margin: 14px 0;
   padding: 8px 12px;
 }
-.transfer-preview .preview-list li { padding-block: 6px; font-size: 14px; overflow-wrap: anywhere; }
+.transfer-preview .preview-list li { padding-block: 6px; font-size: var(--type-body); overflow-wrap: anywhere; }
 .transfer-preview .preview-list li + li { border-top: 1px solid var(--line); }
 .transfer-preview > .btn { width: 100%; }
 .transfer-preview > .error { color: var(--error-text); }

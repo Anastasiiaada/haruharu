@@ -122,7 +122,7 @@
 
 .duplicate-choice {
   padding: 4px;
-  font-size: .9em;
+  font-size: var(--type-secondary);
 }
 
 .material-record-list {

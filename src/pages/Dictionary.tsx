@@ -96,7 +96,7 @@ export function Dictionary() {
   }
   return <div className="dictionary-page">
     <div className="page-heading"><div><h1>Словник</h1><p>{words.length} слів</p></div><button className="icon-btn" aria-label="Додати слово" onClick={()=>openEdit({id:uid(),korean:'',translation:'',category:'Загальне',example:'',learned:false,due:0,interval:0,demo:false})}><Plus size={21}/></button></div>
-    <div className="tools dictionary-tools"><div className="search"><Search size={18}/><input aria-label="Пошук слів" placeholder="Корейською або українською…" value={query} onChange={e=>setQuery(e.target.value)}/></div><select aria-label="Категорія" value={currentCategory} onChange={e=>setCategory(e.target.value)}>{['Усі',...categories].map(value=><option key={value}>{value}</option>)}</select></div>
+    <div className="tools dictionary-tools"><div className="search"><Search size={18}/><input aria-label="Пошук слів" placeholder="Знайти слово…" value={query} onChange={e=>setQuery(e.target.value)}/></div><select aria-label="Категорія" value={currentCategory} onChange={e=>setCategory(e.target.value)}>{['Усі',...categories].map(value=><option key={value}>{value}</option>)}</select></div>
     <div className="dictionary-options">
       <div className="dictionary-views" role="group" aria-label="Режим перегляду словника">{views.map(({value,label,Icon})=><button type="button" key={value} aria-pressed={view===value} onClick={()=>void db.settings.put({key:'dictionaryView',value}).catch(()=>toast('Не вдалося зберегти режим.','error'))}><Icon size={17}/>{label}</button>)}</div>
       <CompactMenu label="Налаштування словника">

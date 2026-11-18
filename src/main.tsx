@@ -26,3 +26,4 @@ import './components/mobile-learning.css';
 import './components/native-mobile.css';
 import './components/ux-refinements.css';
 import './components/theme-contrast.css';
+import './components/typography.css';
