@@ -1,0 +1,173 @@
+.material-management-list {
+  margin: 18px 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.material-management-list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.material-management-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: color-mix(in srgb, #b396cd 20%, var(--surface));
+}
+
+.material-management-list li:nth-child(2) .material-management-icon {
+  background: color-mix(in srgb, #91b49a 22%, var(--surface));
+}
+
+.material-management-list li:nth-child(3) .material-management-icon {
+  background: color-mix(in srgb, #dd9cb3 22%, var(--surface));
+}
+
+.material-management-list small,
+.material-duplicate-results small,
+.material-backup small {
+  display: block;
+  color: var(--muted);
+}
+
+.material-management-dialog h2 { padding-inline-end: 32px; }
+.material-management-dialog > p { margin-block: 12px; }
+
+.material-backup,
+.material-duplicate-results details {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.material-backup { background: var(--bg); }
+.material-backup p { margin: 0 0 8px; }
+.material-backup small { margin-top: 8px; }
+
+.material-duplicate-results {
+  display: grid;
+  gap: 8px;
+}
+
+.material-duplicate-results summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.material-duplicate-results ul {
+  padding-inline-start: 18px;
+  margin-block: 8px 0;
+  overflow-wrap: anywhere;
+}
+
+.material-duplicate-results li + li { margin-top: 6px; }
+
+.material-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.material-management .btn svg { flex-shrink: 0; }
+
+.material-selection {
+  display: grid;
+  gap: 8px;
+  margin-block: 14px;
+}
+
+.material-selection-actions,
+.material-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.material-pagination {
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.material-checkbox {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  cursor: pointer;
+  min-width: 0;
+  min-height: 44px;
+  overflow-wrap: anywhere;
+}
+
+.material-checkbox input[type="checkbox"] {
+  width: 23px;
+  height: 23px;
+  flex: none;
+  margin: 0;
+  accent-color: #9879b1;
+  cursor: pointer;
+}
+
+.duplicate-choice {
+  padding: 4px;
+  font-size: .9em;
+}
+
+.material-record-list {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.selectable-material,
+.material-record {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow-wrap: anywhere;
+}
+
+.selectable-material:has(input:checked) {
+  background: color-mix(in srgb, #b396cd 22%, var(--surface));
+  border-color: #9879b1;
+}
+
+.selectable-material > span,
+.material-record > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.selectable-material small,
+.material-record small { color: var(--muted); }
+
+.material-record {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.material-filters select { min-width: 0; max-width: 100%; }
+
+@media (max-width: 480px) {
+  .material-management-list li { grid-template-columns: auto minmax(0, 1fr); }
+  .material-management-list .btn { grid-column: 1 / -1; }
+  .material-dialog-actions .btn { width: 100%; }
+  .material-selection-actions .btn { flex: 1 1 auto; min-width: 0; }
+  .material-selection-actions .danger { flex-basis: 100%; }
+  .material-filters > * { flex: 1 1 100%; }
+}
